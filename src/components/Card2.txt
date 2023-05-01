@@ -1,0 +1,58 @@
+import { useState, useEffect } from 'react';
+
+function Assistido({ assistido }) {
+  if (assistido) {
+    return <p>Assistido ✔</p>;
+  }
+  return <p className="item">Não assistido</p>;
+}
+
+export default function Card() {
+  const [filmes, setFilmes] = useState([]);
+
+  useEffect(() => {
+    fetch('https://my-json-server.typicode.com/marycamila184/movies/movies')
+      .then(response => response.json())
+      .then(data => {
+        const filmesComAssistido = data.map(filme => {
+          const aleatorio = Math.random() < 0.5;
+          return {
+            ...filme,
+            assistido: aleatorio
+          };
+        });
+        setFilmes(filmesComAssistido);
+      })
+      .catch(error => console.log(error));
+  }, []);
+
+  return (
+    <div className="container text-center">
+      <div className="row">
+        {filmes.map((filme, i) => (
+          <div className="col" key={i}>
+            <div className="card">
+              <img src={filme.poster} alt={filme.title} className="card-img-top" />
+              <div className="card-body">
+                <h5 className="card-title">{filme.title} ({filme.year}) </h5>
+                <p>{filme.plot}</p>
+                <p>{filme.runtime}</p>
+                <p>{filme.genre}</p>
+                <p>{filme.imdbRating}</p>
+                <Assistido assistido={filme.assistido} />
+                <a
+                  href={`/detalhes/${filme.title}`}
+                >
+                  <div className="btn btn-primary">
+                    Detalhes
+                  </div>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
